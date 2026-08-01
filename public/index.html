@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helper Bot Control Panel</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background-color: #2c3e50; color: white; text-align: center; margin: 20px; }
+        .panel { background: #34495e; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 4px 8px black; }
+        input[type="text"] { padding: 10px; width: 70%; border: none; border-radius: 5px; margin: 5px; }
+        button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin: 5px; }
+        .btn-start { background: #2ecc71; color: white; }
+        .btn-stop { background: #e74c3c; color: white; }
+        .btn-cmd { background: #3498db; color: white; }
+        .btn-ai { background: #9b59b6; color: white; }
+        .status { font-size: 24px; font-weight: bold; margin: 10px; }
+        .online { color: #2ecc71; }
+        .offline { color: #e74c3c; }
+        .logs { text-align: left; background: black; color: #0f0; padding: 10px; height: 200px; overflow-y: scroll; border-radius: 5px; font-family: monospace; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <h1>🤖 پنل کنترل ربات Helper</h1>
+        <div class="status">وضعیت: <span id="status" class="offline">OFFLINE</span></div>
+        
+        <div>
+            <form action="/start" method="POST" style="display:inline;"><button class="btn-start" type="submit">روشن کردن ربات</button></form>
+            <form action="/stop" method="POST" style="display:inline;"><button class="btn-stop" type="submit">خاموش کردن ربات</button></form>
+        </div>
+
+        <hr style="border-color: #7f8c8d;">
+        <h3>ارسال مستقیم دستور ماینکرفت</h3>
+        <form action="/command" method="POST">
+            <input type="text" name="command" placeholder="مثلا: /kill Ali" required>
+            <button class="btn-cmd" type="submit">ارسال</button>
+        </form>
+
+        <h3>صحبت با هوش مصنوعی (درخواست از ربات)</h3>
+        <form action="/ask-ai" method="POST">
+            <input type="text" name="ask" placeholder="مثلا: یک شمشیر نِثِرایت به من بده" required>
+            <button class="btn-ai" type="submit">پرسیدن از AI</button>
+        </form>
+
+        <hr style="border-color: #7f8c8d;">
+        <h3>گفتگوهای سرور (Logs)</h3>
+        <div class="logs" id="logs">در حال بارگذاری...</div>
+    </div>
+
+    <script>
+        async function fetchLogs() {
+            const res = await fetch('/logs');
+            const data = await res.json();
+            document.getElementById('status').innerText = data.status;
+            document.getElementById('status').className = data.status === 'ONLINE' ? 'online' : 'offline';
+            document.getElementById('logs').innerText = data.logs.join('\n');
+            document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight;
+        }
+        setInterval(fetchLogs, 3000); // هر 3 ثانیه یکبار آپدیت میشود
+        fetchLogs();
+    </script>
+</body>
+</html>
